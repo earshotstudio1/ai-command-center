@@ -1,3 +1,18 @@
+---
+title: AI Command Center
+date: '2026-08-19'
+type: project-note
+domain: project
+stage: active
+decision: undecided
+source: manual
+status: active
+tags: []
+created: '2026-08-19'
+updated: '2026-08-19'
+workflow: capture_telegram
+---
+
 # AI Command Center
 
 A local dashboard that puts every AI system I run on one screen.
@@ -5,8 +20,9 @@ A local dashboard that puts every AI system I run on one screen.
 <!-- Daniel: take and add these two screenshots manually before publishing.
      1. docs/screenshot-graph.png — the Vault tab's knowledge graph
      2. docs/screenshot-pipeline.png — the Pipeline tab's kanban board
-     Check note titles in both for anything personal or client-related before saving. -->
-![Vault knowledge graph](docs/screenshot-graph.png)
+     Check note titles in both for anything personal or client-related before saving,
+     then uncomment the two image lines below. -->
+<!-- ![Vault knowledge graph](docs/screenshot-graph.png) -->
 
 ## Why it exists
 
@@ -20,7 +36,7 @@ This is the one screen instead.
 - **Vault** — an interactive knowledge graph of the whole vault: zoom, pan, hover to highlight a note's neighbourhood, toggle tag hubs, click through to open in Obsidian. Folder health sits beneath it.
 - **Pipeline** — a kanban board over the project lifecycle (Captured, Developing, Building, Paused, Shipped) with a drawer per card for preview, pause and unpause. Unpause returns a project to exactly where it left off.
 
-![Pipeline board](docs/screenshot-pipeline.png)
+<!-- ![Pipeline board](docs/screenshot-pipeline.png) -->
 
 - **Agents** — real health for each agent, the assistant's task list, the capture bot's processed items, maintenance run history with report links.
 - **Code** — every repo in the workspace with branch, last commit, uncommitted count and a link out.
