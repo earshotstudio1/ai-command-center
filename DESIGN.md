@@ -1,18 +1,3 @@
----
-title: AI Command Center v2 — Audit & Design
-date: '2026-08-19'
-type: project-note
-domain: project
-stage: active
-decision: undecided
-source: manual
-status: active
-tags: []
-created: '2026-08-19'
-updated: '2026-08-19'
-workflow: capture_telegram
----
-
 # AI Command Center v2 — Audit & Design
 
 Date: 2026-07-03
