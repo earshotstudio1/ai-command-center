@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body data-vault="{{ vault_name }}" data-actions="{{ 'on' if actions_enabled else 'off' }}">
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-gem">◆</div>
+      <div class="brand-name">AI COMMAND CENTER <span class="v2">v2</span></div>
+    </div>
+    <nav class="topbar-nav" id="nav">
+      <button class="nav-tab active" data-view="home">Home</button>
+      <button class="nav-tab" data-view="overview">Overview</button>
+      <button class="nav-tab" data-view="pipeline">Pipeline</button>
+      <button class="nav-tab" data-view="agents">Agents</button>
+      <button class="nav-tab" data-view="code">Code</button>
+      <button class="nav-tab" data-view="vault">Vault</button>
+    </nav>
+    <div class="topbar-right">
+      <div class="needs-you" id="needs-you" title="Pending approvals + clarifications">—</div>
+      <div class="agent-lights" id="agent-lights"></div>
+      <div class="clock" id="clock"></div>
+    </div>
+  </header>
+
+  <main class="views">
+
+    <!-- HOME -->
+    <section class="view active" id="view-home">
+      <div class="home-wrap">
+        <div class="home-greeting" id="home-greeting"></div>
+        <div class="home-cols">
+          <div class="panel home-panel">
+            <div class="panel-head"><h2>Last Done</h2></div>
+            <div class="panel-body" id="home-lastdone"></div>
+          </div>
+          <div class="panel home-panel home-next">
+            <div class="panel-head">
+              <h2>Next Steps</h2>
+              <div class="tool-select" id="tool-select" title="Which agent to launch for Action"></div>
+            </div>
+            <div class="panel-body" id="home-nextsteps"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OVERVIEW -->
+    <section class="view" id="view-overview">
+      <div class="col">
+        <div class="panel">
+          <div class="panel-head"><h2>Inbox Triage</h2><span class="pill" id="inbox-count">0</span></div>
+          <div class="panel-body" id="inbox-list"></div>
+        </div>
+      </div>
+      <div class="col col-wide">
+        <div class="panel">
+          <div class="panel-head"><h2>Priorities</h2><span class="hint">next_action</span></div>
+          <div class="panel-body" id="priorities-list"></div>
+        </div>
+        <div class="panel grow">
+          <div class="panel-head"><h2>Projects</h2><span class="pill" id="projects-count">0</span></div>
+          <div class="panel-body" id="projects-list"></div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="panel">
+          <div class="panel-head"><h2>Agents</h2></div>
+          <div class="panel-body" id="agents-mini"></div>
+        </div>
+        <div class="panel grow">
+          <div class="panel-head"><h2>Activity</h2></div>
+          <div class="panel-body" id="activity-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PIPELINE -->
+    <section class="view" id="view-pipeline">
+      <div class="pipeline-topline">
+        <div class="pipeline-intro">
+          Orchestrator lifecycle, projected from vault frontmatter — ideas develop in the
+          background and surface here when they need a decision.
+        </div>
+        <div class="seg-toggle" id="pipeline-toggle">
+          <button class="seg active" data-source="live">Live Projects</button>
+          <button class="seg" data-source="idea">Ideas</button>
+          <button class="seg" data-source="all">All</button>
+        </div>
+      </div>
+      <div class="board" id="pipeline-board"></div>
+    </section>
+
+    <!-- AGENTS -->
+    <section class="view" id="view-agents">
+      <div class="agents-grid" id="agents-grid"></div>
+      <div class="panel grow">
+        <div class="panel-head">
+          <div class="seg-toggle" id="agent-switch">
+            <button class="seg active" data-agent="pa">PA Agent</button>
+            <button class="seg" data-agent="capture">Capture Bot</button>
+            <button class="seg" data-agent="maintenance">Maintenance</button>
+            <button class="seg" data-agent="orchestrator">Orchestrator</button>
+          </div>
+          <span class="hint" id="agent-pane-hint"></span>
+        </div>
+        <div class="panel-body" id="agent-pane"></div>
+      </div>
+    </section>
+
+    <!-- CODE -->
+    <section class="view" id="view-code">
+      <div class="panel grow">
+        <div class="panel-head"><h2>Code Workspace</h2><span class="hint" id="code-root-hint"></span></div>
+        <div class="panel-body code-grid" id="code-grid"></div>
+      </div>
+    </section>
+
+    <!-- VAULT -->
+    <section class="view" id="view-vault">
+      <div class="panel graph-panel">
+        <div class="panel-head">
+          <h2>Knowledge Graph</h2>
+          <div class="graph-controls">
+            <span class="hint" id="graph-stats"></span>
+            <label class="graph-check"><input type="checkbox" id="graph-tags" checked> tags</label>
+            <button class="btn" id="graph-fit">fit</button>
+          </div>
+        </div>
+        <div class="graph-holder" id="graph-holder">
+          <div id="graph"></div>
+          <div class="graph-legend" id="graph-legend"></div>
+        </div>
+      </div>
+      <div class="panel health-panel">
+        <div class="panel-head"><h2>Folder Health</h2></div>
+        <div class="panel-body health-grid" id="health-grid"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="statusbar">
+    <span id="status-msg">ready</span>
+    <span class="spacer"></span>
+    <span id="last-refresh"></span>
+  </footer>
+</div>
+
+<!-- TASK DRAWER -->
+<div class="drawer-scrim" id="drawer-scrim"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <h2 id="drawer-title">Task</h2>
+    <button class="drawer-close" id="drawer-close">✕</button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+</aside>
+
+<script src="https://unpkg.com/force-graph@1.49.4/dist/force-graph.min.js"></script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

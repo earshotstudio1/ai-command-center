@@ -1,0 +1,11 @@
+{
+  "vault": "C:/path/to/your/vault",
+  "vault_name": "YourVault",
+  "pa_db": "C:/path/to/your/personal-assistant-agent/data/pa_agent.sqlite3",
+  "secondbrain_dir": "C:/path/to/your/vault/.second-brain",
+  "capture_log": "C:/path/to/your/second-brain/capture.log",
+  "code_root": "C:/path/to/your/code/workspace",
+  "port": 5150,
+  "enable_actions": true,
+  "cache_ttl_seconds": 15
+}
