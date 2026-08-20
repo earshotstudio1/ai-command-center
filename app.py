@@ -6,6 +6,7 @@ URL:  http://127.0.0.1:5150
 from __future__ import annotations
 
 from functools import wraps
+from urllib.parse import urlparse
 
 from flask import Flask, jsonify, render_template, request
 
@@ -18,9 +19,16 @@ import pa
 import pipeline
 import secondbrain
 import vault
+from auth import TOKEN_HEADER, token_matches
 from config import ENABLE_ACTIONS, PA_DB, PORT, VAULT, VAULT_NAME
 
 app = Flask(__name__)
+
+_ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
+
+
+class Forbidden(Exception):
+    """Request failed the local-origin or token check."""
 
 
 def api(fn):
@@ -29,6 +37,8 @@ def api(fn):
     def wrapper(*args, **kwargs):
         try:
             return jsonify(fn(*args, **kwargs))
+        except Forbidden as exc:
+            return jsonify({"error": str(exc)}), 401
         except ValueError as exc:
             return jsonify({"error": str(exc)}), 400
         except Exception as exc:
@@ -36,7 +46,25 @@ def api(fn):
     return wrapper
 
 
+def _request_is_local() -> bool:
+    """Reject any request whose Origin/Host claims to be something other than
+    this machine, even though the server only binds to 127.0.0.1 anyway."""
+    origin = request.headers.get("Origin")
+    if origin:
+        host = urlparse(origin).hostname
+        if host not in _ALLOWED_HOSTS:
+            return False
+    host_header = (request.host or "").split(":")[0]
+    return host_header in _ALLOWED_HOSTS
+
+
 def require_actions():
+    """Gate for every state-changing endpoint: same-machine origin, a valid
+    dashboard token, and enable_actions turned on in config.json."""
+    if not _request_is_local():
+        raise Forbidden("Rejected: request did not originate from this machine")
+    if not token_matches(request.headers.get(TOKEN_HEADER)):
+        raise Forbidden("Missing or invalid dashboard token")
     if not ENABLE_ACTIONS:
         raise ValueError("Actions are disabled in config.json (enable_actions)")
 
@@ -249,5 +277,6 @@ if __name__ == "__main__":
     print(f"  Vault:   {VAULT}  (exists: {VAULT.exists()})")
     print(f"  PA DB:   {PA_DB}  (exists: {PA_DB.exists()})")
     print(f"  Actions: {'enabled' if ENABLE_ACTIONS else 'disabled'}")
+    print(f"  Auth:    token in .dashboard_token (open via launch-dashboard.ps1 / start.bat)")
     print(f"{'=' * 56}\n")
     app.run(debug=False, port=PORT, host="127.0.0.1")

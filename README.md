@@ -51,7 +51,7 @@ This is the one screen instead.
 
 ## Status
 
-Around 1,800 lines across 12 modules. Runs locally on port 5150, no build step, no dependencies beyond Flask and PyYAML. Single-user by design and not hardened for anything else: it binds to localhost, has no authentication, and should not be exposed. The v1 audit and the full v2 design are in [DESIGN.md](DESIGN.md).
+Around 1,800 lines across 12 modules. Runs locally on port 5150, no build step, no dependencies beyond Flask and PyYAML. Single-user by design and not hardened for anything else: it binds to 127.0.0.1 only and should not be exposed to a network. `enable_actions` defaults to `false`, so a fresh checkout is read-only until you opt in. When actions are on, every state-changing endpoint also requires a random per-install token (generated on first run into the gitignored `.dashboard_token`, passed to the page via the launcher's URL and sent back as a header) and rejects any request whose Origin or Host is not localhost. The v1 audit and the full v2 design are in [DESIGN.md](DESIGN.md).
 
 ## Setup
 

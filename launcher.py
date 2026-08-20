@@ -40,6 +40,16 @@ _CODEX_APP_CANDIDATES = [
     _LOCAL / "Programs" / "Codex" / "Codex.exe",
 ]
 
+# `code` on PATH is normally a .cmd/.bat shim (bin\code.cmd next to the real
+# Code.exe), and CreateProcess cannot exec a .cmd/.bat directly without a
+# shell in between. Resolve the actual Code.exe so it can be launched with a
+# plain argv list and no shell.
+_VSCODE_EXE_CANDIDATES = [
+    _LOCAL / "Programs" / "Microsoft VS Code" / "Code.exe",
+    Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "Microsoft VS Code" / "Code.exe",
+    Path(os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")) / "Microsoft VS Code" / "Code.exe",
+]
+
 
 def _find_app(config_key: str, candidates: list[Path]) -> str | None:
     pinned = CONFIG.get(config_key)
@@ -52,7 +62,18 @@ def _find_app(config_key: str, candidates: list[Path]) -> str | None:
 
 
 def _vscode() -> str | None:
-    return shutil.which("code")
+    """Resolve the actual Code.exe, never the `code` shim script."""
+    for c in _VSCODE_EXE_CANDIDATES:
+        if c.exists():
+            return str(c)
+    shim = shutil.which("code")
+    if shim:
+        shim_path = Path(shim)
+        # bin\code(.cmd) -> the install root's Code.exe
+        candidate = shim_path.parent.parent / "Code.exe"
+        if candidate.exists():
+            return str(candidate)
+    return None
 
 
 def available_tools() -> list[dict]:
@@ -114,7 +135,7 @@ def launch(tool: str, path_str: str, prompt: str = "") -> dict:
         clip_note = " — prompt copied to clipboard, paste it into the agent"
 
     if tool in ("claude-vscode", "codex-vscode"):
-        _spawn(["cmd", "/c", _vscode(), str(path)])
+        _spawn([_vscode(), str(path)])
         return {"launched": tool, "path": str(path), "note": "VS Code opened" + clip_note}
 
     key = "claude_app_path" if tool == "claude-app" else "codex_app_path"

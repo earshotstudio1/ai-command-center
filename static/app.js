@@ -4,6 +4,26 @@
 const VAULT_NAME = document.body.dataset.vault;
 const ACTIONS_ON = document.body.dataset.actions === "on";
 const REFRESH_MS = 30000;
+const TOKEN_STORAGE_KEY = "cc-dashboard-token";
+
+/* The launcher opens the dashboard with ?token=... on the URL. Pick it up
+   once, remember it in localStorage, then scrub it from the address bar so
+   it doesn't linger in browser history. */
+(function initToken() {
+  const params = new URLSearchParams(location.search);
+  const token = params.get("token");
+  if (token) {
+    localStorage.setItem(TOKEN_STORAGE_KEY, token);
+    params.delete("token");
+    const rest = params.toString();
+    const clean = location.pathname + (rest ? `?${rest}` : "") + location.hash;
+    history.replaceState(null, "", clean);
+  }
+})();
+
+function dashboardToken() {
+  return localStorage.getItem(TOKEN_STORAGE_KEY) || "";
+}
 
 let drawerOpen = false;
 let currentTaskId = null;
@@ -35,7 +55,10 @@ async function getJSON(url) {
 async function postJSON(url, body) {
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "X-Dashboard-Token": dashboardToken(),
+    },
     body: JSON.stringify(body || {}),
   });
   const data = await res.json();

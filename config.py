@@ -18,7 +18,7 @@ DEFAULTS: dict = {
     "capture_log": r"C:\path\to\your\second-brain\capture.log",
     "code_root": r"C:\path\to\your\code\workspace",
     "port": 5150,
-    "enable_actions": True,
+    "enable_actions": False,
     "cache_ttl_seconds": 15,
 }
 

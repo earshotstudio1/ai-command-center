@@ -6,6 +6,6 @@
   "capture_log": "C:/path/to/your/second-brain/capture.log",
   "code_root": "C:/path/to/your/code/workspace",
   "port": 5150,
-  "enable_actions": true,
+  "enable_actions": false,
   "cache_ttl_seconds": 15
 }

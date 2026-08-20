@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 config.json
+.dashboard_token
 .venv/
 *.log
 FEEDBACK.md
